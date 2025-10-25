@@ -5,69 +5,6 @@ import openpyxl # type: ignore
 
 class ExcelUtil:
 
-    excel_request_name = "excel_request"
-    @classmethod
-    def get_excel_request_objects(cls, request_dict: dict) -> tuple[str, dict]:
-        '''
-        {"context": {"excel_request": {}}}の形式で渡される
-        '''
-        # contextを取得
-        request:Union[dict, None] = request_dict.get(cls.excel_request_name, None)
-        if not request:
-            raise ValueError("request is not set.")
-        # file_pathとdata_jsonを取得
-        file_path = request.get("file_path", None)
-        data_json = request.get("data_json", "[]")
-        data = json.loads(data_json)
-
-        return file_path, data
-
-    @classmethod
-    def get_sheet_names_api(cls, request_json: str):
-        # request_jsonからrequestを作成
-        request_dict: dict = json.loads(request_json)
-        # excel_requestを取得
-        file_path, _ = ExcelUtil.get_excel_request_objects(request_dict)
-        text = ExcelUtil.get_sheet_names(file_path)
-        return {"output": text}
-
-    @classmethod
-    def extract_excel_sheet_api(cls, request_json: str):
-        # request_jsonからrequestを作成
-        request_dict: dict = json.loads(request_json)
-        # excel_requestを取得
-        file_path, excel_request = ExcelUtil.get_excel_request_objects(request_dict)
-        # excel_sheet_nameを取得
-        sheet_name = excel_request.get("excel_sheet_name", "")
-
-        text = ExcelUtil.extract_text_from_sheet(file_path, sheet_name)
-        return {"output": text}
-
-    @classmethod
-    def export_to_excel_api(cls, request_json: str):
-        # request_jsonからrequestを作成
-        request_dict: dict = json.loads(request_json)
-        
-        # file_pathとdata_jsonを取得
-        file_path, dataJson = ExcelUtil.get_excel_request_objects(request_dict)
-        ExcelUtil.export_to_excel(file_path, dataJson.get("rows",[]))
-        # 結果用のdictを生成
-        return {}
-
-    @classmethod
-    def import_from_excel_api(cls, request_json: str):
-        # request_jsonからrequestを作成
-        request_dict: dict = json.loads(request_json)
-        # file_requestを取得
-        file_path, _ = cls.get_excel_request_objects(request_dict)
-        # import_to_excelを実行
-        data = ExcelUtil.import_from_excel(file_path)
-        # 結果用のdictを生成
-        result = {}
-        result["rows"] = data
-        return result
-
-
     @classmethod
     def export_to_excel(cls, filePath, data):
         # Workbookオブジェクトを生成
