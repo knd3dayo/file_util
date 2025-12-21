@@ -1,3 +1,4 @@
+from fastapi import FastAPI, APIRouter
 
 from file_util.core.app import (
     get_mime_type,
@@ -10,36 +11,35 @@ from file_util.core.app import (
     extract_zip,
     create_zip,
 )
-from fastapi import FastAPI
 app = FastAPI()
+router = APIRouter()
 # get_mime_type
-app.add_api_route(path='/get_mime_type', endpoint=get_mime_type, methods=['GET'])
+router.add_api_route(path='/get_mime_type', endpoint=get_mime_type, methods=['GET'])
  
 # get_sheet_names
-app.add_api_route(path='/get_sheet_names', endpoint=get_sheet_names, methods=['GET'])
-
+router.add_api_route(path='/get_sheet_names', endpoint=get_sheet_names, methods=['GET'])
 # extract_excel_sheet
-app.add_api_route(path='/extract_excel_sheet', endpoint=extract_excel_sheet, methods=['POST'])
+router.add_api_route(path='/extract_excel_sheet', endpoint=extract_excel_sheet, methods=['POST'])
 
 # extract_text_from_file
-app.add_api_route(path='/extract_text_from_file', endpoint=extract_text_from_file, methods=['POST'])
+router.add_api_route(path='/extract_text_from_file', endpoint=extract_text_from_file, methods=['POST'])
 
 # extract_base64_to_text
-app.add_api_route(path='/extract_base64_to_text', endpoint=extract_base64_to_text, methods=['GET'])
+router.add_api_route(path='/extract_base64_to_text', endpoint=extract_base64_to_text, methods=['GET'])
 
 # extract_text_from_file
-app.add_api_route(path='/extract_text_from_file', endpoint=extract_text_from_file, methods=['POST'])
+router.add_api_route(path='/extract_text_from_file', endpoint=extract_text_from_file, methods=['POST'])
 
 # ZIPファイルの内容をリストする関数
-app.add_api_route(path='/list_zip_contents', endpoint=list_zip_contents, methods=['GET'])
+router.add_api_route(path='/list_zip_contents', endpoint=list_zip_contents, methods=['GET'])
 
 # ZIPファイルを展開する関数
-app.add_api_route(path='/extract_zip', endpoint=extract_zip, methods=['POST'])
+router.add_api_route(path='/extract_zip', endpoint=extract_zip, methods=['POST'])
 
 # ZIPファイルを作成する関数
-app.add_api_route(path='/create_zip', endpoint=create_zip, methods=['POST'])
+router.add_api_route(path='/create_zip', endpoint=create_zip, methods=['POST'])
 
-
+app.include_router(router, prefix="/api/file_util")
 if __name__ == "__main__":
     import uvicorn
     from dotenv import load_dotenv
