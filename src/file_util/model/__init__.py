@@ -3,21 +3,30 @@ from magika.types import MagikaResult
 from chardet.universaldetector import UniversalDetector
 from pathlib import Path
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 import file_util.log.log_settings as log_settings
 logger = log_settings.getLogger(__name__)
 
 class DocumentType(BaseModel):
 
     document_path: str = Field(..., description="Path to the document")
+    __mime_type: str = PrivateAttr("")
+    __encoding: str | None = PrivateAttr(None)
 
+    @property
+    def mime_type(self) -> str:
+        """MIMEタイプを取得する"""
+        return self.__mime_type
+    @property
+    def encoding(self) -> str | None:
+        """エンコーディングを取得する"""
+        return self.__encoding
+    
     def __init__(self, **data):
         super().__init__(**data)
-
-        mime_type, encoding = DocumentType.identify_type(self.document_path)
-
-        self.mime_type: str = mime_type if mime_type is not None else "application/octet-stream"
-        self.encoding: str | None = encoding
+        mime_type, encoding = self.identify_type(self.document_path)
+        self.__mime_type = mime_type if mime_type else ""
+        self.__encoding = encoding
 
     @classmethod
     def identify_type(cls, filename) -> tuple[str | None, str | None]:
