@@ -10,7 +10,7 @@ async def get_mime_type(
     """
     This function gets the MIME type of a file at the specified path.
     """
-    document_type = DocumentType(document_path=file_path)
+    document_type = DocumentType.from_file(document_path=file_path)
     return document_type.mime_type
 
 # get_sheet_names

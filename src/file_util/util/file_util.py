@@ -50,7 +50,7 @@ class FileUtil:
         Returns:
             str: 抽出されたテキスト。サニタイズ済み。非対応形式の場合は空文字列
         """
-        document_type = DocumentType(document_path=filename)
+        document_type = DocumentType.from_file(document_path=filename)
         encoding = document_type.encoding
         mime_type = document_type.mime_type
         

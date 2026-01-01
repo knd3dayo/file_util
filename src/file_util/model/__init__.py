@@ -9,7 +9,7 @@ logger = log_settings.getLogger(__name__)
 
 class DocumentType(BaseModel):
 
-    document_path: str = Field(..., description="Path to the document")
+    data: bytes = Field(..., description="Document data as bytes")
     __mime_type: str = PrivateAttr("")
     __encoding: str | None = PrivateAttr(None)
 
@@ -24,12 +24,53 @@ class DocumentType(BaseModel):
     
     def __init__(self, **data):
         super().__init__(**data)
-        mime_type, encoding = self.identify_type(self.document_path)
+        mime_type, encoding = self.identify_data_type(self.data)
         self.__mime_type = mime_type if mime_type else ""
         self.__encoding = encoding
 
     @classmethod
-    def identify_type(cls, filename) -> tuple[str | None, str | None]:
+    def from_file(cls, document_path: str) -> "DocumentType":
+        """ファイルパスからDocumentTypeインスタンスを作成する
+
+        Args:
+            document_path: ドキュメントのファイルパス
+
+        Returns:
+            DocumentType: 作成されたDocumentTypeインスタンス
+        """
+        # ファイルのバイト列を取得
+        with open(document_path, "rb") as f:
+            byte_data = f.read()
+        
+        return cls(data=byte_data)
+
+    @classmethod
+    def identify_data_type(cls, data: bytes) -> tuple[str | None, str | None]:
+        """バイト列のMIMEタイプとエンコーディングを判定する
+
+        Args:
+            data: 判定対象のバイト列
+
+        Returns:
+            tuple[str | None, str | None]:
+                MIMEタイプ文字列とエンコーディング文字列のタプル。
+                判定失敗時は(None, None)
+        """
+        m = Magika()
+        try:
+            res: MagikaResult = m.identify_bytes(data) # type: ignore
+            encoding = None
+            if res.dl.is_text:
+                encoding = cls.get_encoding_from_bytes(data)
+
+        except Exception as e:
+            logger.debug(e)
+            return None, None
+
+        return res.output.mime_type , encoding
+
+    @classmethod
+    def identify_file_type(cls, filename) -> tuple[str | None, str | None]:
         """ファイルのMIMEタイプとエンコーディングを判定する
 
         Args:
