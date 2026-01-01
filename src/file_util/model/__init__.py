@@ -11,7 +11,7 @@ logger = log_settings.getLogger(__name__)
 class DocumentType(BaseModel):
 
     data: bytes = Field(..., description="Document data as bytes")
-    filename: Optional[str] = Field(None, description="Filename of the document")
+    filename: str = Field(..., description="Filename of the document")
     __mime_type: str = PrivateAttr("")
     __encoding: str | None = PrivateAttr(None)
 
