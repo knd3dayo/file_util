@@ -1,4 +1,3 @@
-from typing import Literal, ClassVar
 from magika import Magika
 from magika.types import MagikaResult 
 from chardet.universaldetector import UniversalDetector
@@ -7,6 +6,18 @@ from pathlib import Path
 from pydantic import BaseModel, Field, PrivateAttr
 import file_util.log.log_settings as log_settings
 logger = log_settings.getLogger(__name__)
+
+from enum import StrEnum
+
+class DocumentTypeEnum(StrEnum):
+    TEXT = "text"
+    PDF = "pdf"
+    EXCEL = "excel"
+    WORD = "word"
+    PPT = "ppt"
+    IMAGE = "image"
+    UNSUPPORTED = "unsupported"
+
 
 class DocumentType(BaseModel):
     
@@ -135,27 +146,27 @@ class DocumentType(BaseModel):
         encoding = detector.result['encoding']  
         return encoding
 
-    def get_document_type(self) -> Literal["text", "pdf", "excel", "word", "ppt", "image", "unsupported"]:
+    def get_document_type(self) -> DocumentTypeEnum:
         """Determine the document type based on its MIME type.
 
         Returns:
-            Literal["text", "pdf", "excel", "word", "ppt", "image", "unsupported"]:
+            DocumentTypeEnum:
                 The determined document type.
         """
         if self.is_text():
-            return "text"
+            return DocumentTypeEnum.TEXT
         elif self.is_pdf():
-            return "pdf"
+            return DocumentTypeEnum.PDF
         elif self.is_excel():
-            return "excel"
+            return DocumentTypeEnum.EXCEL
         elif self.is_word():
-            return "word"
+            return DocumentTypeEnum.WORD
         elif self.is_ppt():
-            return "ppt"
+            return DocumentTypeEnum.PPT
         elif self.is_image():
-            return "image"
+            return DocumentTypeEnum.IMAGE
         else:
-            return "unsupported"
+            return DocumentTypeEnum.UNSUPPORTED
 
     def is_text(self) -> bool:
         """Check if the document type is a text type based on its MIME type."""

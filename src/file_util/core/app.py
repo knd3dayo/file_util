@@ -1,12 +1,14 @@
 from typing import Annotated, Optional, Literal
 from pydantic import Field
-from file_util.util.file_util import FileUtil, DocumentType
+from file_util.util.file_util import FileUtil
+from file_util.model import DocumentTypeEnum, DocumentType
 from file_util.util.excel_util import ExcelUtil
 from file_util.util.zip_util import ZipUtil
 
+
 async def get_document_type(
     file_path: Annotated[str, Field(description="Path to the file to get types for")]
-    ) -> Annotated[Literal['text', 'pdf', 'excel', 'word', 'ppt', 'image', 'unsupported'], Field(description="Type of the document. None if undetectable")]:
+    ) -> Annotated[DocumentTypeEnum, Field(description="Type of the document. None if undetectable")]:
     """
     This function gets the type of a file at the specified path.
     """
