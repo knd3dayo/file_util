@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal
 from magika import Magika
 from magika.types import MagikaResult 
 from chardet.universaldetector import UniversalDetector
@@ -134,6 +134,28 @@ class DocumentType(BaseModel):
         detector.close()
         encoding = detector.result['encoding']  
         return encoding
+
+    def get_type(self) -> Literal["text", "pdf", "excel", "word", "ppt", "image", "unsupported"]:
+        """Determine the document type based on its MIME type.
+
+        Returns:
+            Literal["text", "pdf", "excel", "word", "ppt", "image", "unsupported"]:
+                The determined document type.
+        """
+        if self.is_text():
+            return "text"
+        elif self.is_pdf():
+            return "pdf"
+        elif self.is_excel():
+            return "excel"
+        elif self.is_word():
+            return "word"
+        elif self.is_ppt():
+            return "ppt"
+        elif self.is_image():
+            return "image"
+        else:
+            return "unsupported"
 
     def is_text(self) -> bool:
         """Check if the document type is a text type based on its MIME type."""
